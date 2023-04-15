@@ -45,7 +45,7 @@ public class CanvasManager : MonoBehaviour
             gameUI.SetActive(true);
         }
 
-        // If the game is over
+        // If the game is over or paused
         if (gameMechanics.gameOver || paused)
         {
             // Enable the end game screen and disable the game UI
@@ -55,15 +55,9 @@ public class CanvasManager : MonoBehaviour
             if (paused)
             {
                 screenText.text = "Paused";
-            }
-            // If the player has won the game
-            else if (gameMechanics.wonGame)
+            }else
             {
-                screenText.text = "You won";
-            }
-            else
-            {
-                screenText.text = "You Lost";
+                screenText.text = gameMechanics.wonGameText;
             } 
         }
 

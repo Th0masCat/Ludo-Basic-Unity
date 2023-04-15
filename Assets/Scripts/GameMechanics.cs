@@ -25,7 +25,7 @@ public class GameMechanics : MonoBehaviour
     int turnCounter = 0;
     int[] currentIndex = new int[] { 0, 0, 0, 0 };
     int[] positionAfterRoll = new int[] { 0, 0, 0, 0 };
-    public bool wonGame = false;
+    public string wonGameText;
     public bool gameOver = false;
     bool turnGoing = false;
 
@@ -92,13 +92,7 @@ public class GameMechanics : MonoBehaviour
             StartCoroutine(MoveForward(index, currentPiece, tiles));
             gameOver = true;
 
-            if(index == 0)
-            {
-                wonGame = true;
-                Debug.Log("You won");
-            }
-
-            Debug.Log("Player " + (index + 1) + " won");
+            wonGameText = "Player " + (index+1) + " won!";
         }
 
         // Moving the player's pawn forward if they haven't won the game
