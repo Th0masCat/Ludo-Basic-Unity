@@ -2,8 +2,6 @@ using System.Collections;
 using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
-using UnityEngine.SceneManagement;
-
 public class GameMechanics : MonoBehaviour
 {
     // Define arrays of tiles for each color, and an array of player game objects
@@ -19,20 +17,20 @@ public class GameMechanics : MonoBehaviour
     [SerializeField]
     GameObject[] blueTiles;
 
+    // Array of pawns
     [SerializeField]
     GameObject[] pawnGameObject;
 
-    // Declare and initialize turn counter, current index array, and position after roll array
+    // Variables to keep track of the game state
     int turnCounter = 0;
     int[] currentIndex = new int[] { 0, 0, 0, 0 };
     int[] positionAfterRoll = new int[] { 0, 0, 0, 0 };
-
     public bool wonGame = false;
     public bool gameOver = false;
-
     bool turnGoing = false;
 
 
+    // Text elements for displaying dice roll and current turn
     [SerializeField]
     TextMeshProUGUI diceText;
 
@@ -41,10 +39,9 @@ public class GameMechanics : MonoBehaviour
 
     void Update()
     {
-        // Check if the space key is pressed
+        // Checking if the space key is pressed and the game is not over or the turn is not ongoing
         if (Input.GetKeyDown(KeyCode.Space) && !gameOver && !turnGoing)
         {
-            
             // Use switch case to determine whose turn it is based on turn counter
             switch (turnCounter)
             {
@@ -74,18 +71,18 @@ public class GameMechanics : MonoBehaviour
         }
     }
 
-    // Define Turn method to handle player turns
+    // Method to start a player's turn
     void Turn(int index, GameObject currentPiece, GameObject[] tiles)
     {
-        // Roll dice and log the result
+        // Rolling the dice
         int diceRollNumber = DiceRoll();
         diceText.text = "Dice: " + diceRollNumber;
         Debug.Log(diceRollNumber);
 
-        // Add dice roll to position after roll array for the current player
+        // Updating the player's position after the dice roll
         positionAfterRoll[index] += diceRollNumber;
 
-        // Check if player has reached the end of the board and set wonGame=true if index=0(your player)
+        // Checking if the player has won the game
         if (positionAfterRoll[index] == tiles.Length - 1)
         {
             StartCoroutine(MoveForward(index, currentPiece, tiles));
@@ -100,7 +97,7 @@ public class GameMechanics : MonoBehaviour
             Debug.Log("Player " + (index + 1) + " won");
         }
 
-        // Move player forward if they have not reached the end of the board
+        // Moving the player's pawn forward if they haven't won the game
         if (positionAfterRoll[index] < tiles.Length)
         {
             Debug.Log(positionAfterRoll[index]);
@@ -126,13 +123,18 @@ public class GameMechanics : MonoBehaviour
         for (int i = currentIndex[index]; i <= positionAfterRoll[index]; i++)
         {
             currentPiece.transform.position = tiles[i].transform.position;
+
+            // set the turnGoing bool to true to prevent the player from rolling the dice again before their turn is over
             turnGoing = true;
-            pawnGameObject[index].GetComponent<Animator>().SetBool("moving", true);
             yield return new WaitForSeconds(0.5f);
         }
+
         pawnGameObject[index].GetComponent<Animator>().SetBool("moving", false);
         turnGoing = false;
+
         turnText.text = "Current Turn: Player " + (turnCounter + 1);
+
+        // Update the current index to the position after rolling the dice
         currentIndex[index] = positionAfterRoll[index];
     }
 
