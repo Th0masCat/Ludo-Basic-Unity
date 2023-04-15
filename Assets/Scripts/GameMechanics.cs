@@ -30,6 +30,8 @@ public class GameMechanics : MonoBehaviour
     public bool wonGame = false;
     public bool gameOver = false;
 
+    bool turnGoing = false;
+
 
     [SerializeField]
     TextMeshProUGUI diceText;
@@ -37,11 +39,10 @@ public class GameMechanics : MonoBehaviour
     [SerializeField]
     TextMeshProUGUI turnText;
 
-
     void Update()
     {
         // Check if the space key is pressed
-        if (Input.GetKeyDown(KeyCode.Space) && !gameOver)
+        if (Input.GetKeyDown(KeyCode.Space) && !gameOver && !turnGoing)
         {
             
             // Use switch case to determine whose turn it is based on turn counter
@@ -70,7 +71,6 @@ public class GameMechanics : MonoBehaviour
                 turnCounter = 0;
             }
 
-            turnText.text = "Current Turn: Player " + (turnCounter + 1);
         }
     }
 
@@ -126,8 +126,13 @@ public class GameMechanics : MonoBehaviour
         for (int i = currentIndex[index]; i <= positionAfterRoll[index]; i++)
         {
             currentPiece.transform.position = tiles[i].transform.position;
-            yield return new WaitForSeconds(0);
+            turnGoing = true;
+            pawnGameObject[index].GetComponent<Animator>().SetBool("moving", true);
+            yield return new WaitForSeconds(0.5f);
         }
+        pawnGameObject[index].GetComponent<Animator>().SetBool("moving", false);
+        turnGoing = false;
+        turnText.text = "Current Turn: Player " + (turnCounter + 1);
         currentIndex[index] = positionAfterRoll[index];
     }
 
