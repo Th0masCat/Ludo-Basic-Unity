@@ -18,45 +18,60 @@ public class GameMechanics : MonoBehaviour
     [SerializeField]
     GameObject[] blueTiles;
 
-
-
     [SerializeField]
-    GameObject player;
-
-    [SerializeField]
-    GameObject playerPrefab;
-
-    int[] startPositions = new int[] {0, 13, 26, 39};
+    GameObject[] playerPrefab;
 
 
-    int currentIndex = 0;
-    int positionAfterRoll = 0;
 
-    void Start()
-    {
-        foreach(var i in startPositions)
-        {
-            Instantiate(playerPrefab, redTiles[i].transform.position, redTiles[i].transform.rotation);
-        }
-    }
-
-
+    int x = 0;
 
     void Update()
     {
         if (Input.GetKeyDown(KeyCode.Space))
         {
-            int diceRollNumber = DiceRoll();
-            Debug.Log(diceRollNumber);
-            positionAfterRoll += diceRollNumber;
-            if (positionAfterRoll > redTiles.Length - 1)
+            switch (x)
             {
-                Debug.Log(positionAfterRoll);
-                
+                case 0:
+                    Turn(0, playerPrefab[0], redTiles);
+                    break;
+                case 1:
+                    Turn(1, playerPrefab[1], blueTiles);
+                    break;
+                case 2:
+                    Turn(2, playerPrefab[2], yellowTiles);
+                    break;
+                case 3:
+                    Turn(3, playerPrefab[3], greenTiles);
+                    break;
+                default:
+                    break;
+            }
+            x++;
+            if(x == 4)
+            {
+                x = 0;
             }
 
-            MoveForward();
         }
+    }
+
+    int[] currentIndex = new int[] {0, 0, 0, 0};
+    int[] positionAfterRoll = new int[] { 0, 0, 0, 0 };
+
+
+
+    void Turn(int index, GameObject currentPiece, GameObject[] tiles)
+    {
+        int diceRollNumber = DiceRoll();
+
+        positionAfterRoll[index] += diceRollNumber;
+        
+        if (positionAfterRoll[index] < tiles.Length - 1)
+        {
+            MoveForward(index, currentPiece, tiles);
+            Debug.Log(positionAfterRoll[index]);
+        }
+
     }
 
     int DiceRoll()
@@ -64,14 +79,14 @@ public class GameMechanics : MonoBehaviour
         return Random.Range(1, 7);
     }
 
-    void MoveForward()
+    void MoveForward(int index,GameObject currentPiece, GameObject[] tiles)
     {
-        for (int i = currentIndex; i <= positionAfterRoll; i++)
+        for (int i = currentIndex[index]; i <= positionAfterRoll[index]; i++)
         {
-            player.transform.position = redTiles[i].transform.position;
-            Debug.Log(positionAfterRoll);
+            currentPiece.transform.position = tiles[i].transform.position;
+            Debug.Log(positionAfterRoll[index]);
         }
-        currentIndex = positionAfterRoll;
+        currentIndex[index] = positionAfterRoll[index];
     }
-    
+
 }
