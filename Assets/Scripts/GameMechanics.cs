@@ -1,14 +1,15 @@
 using System.Collections;
 using System.Collections.Generic;
+using TMPro;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 public class GameMechanics : MonoBehaviour
 {
-
     // Define arrays of tiles for each color, and an array of player game objects
     [SerializeField]
     GameObject[] redTiles;
-
+        
     [SerializeField]
     GameObject[] yellowTiles;
 
@@ -26,12 +27,23 @@ public class GameMechanics : MonoBehaviour
     int[] currentIndex = new int[] { 0, 0, 0, 0 };
     int[] positionAfterRoll = new int[] { 0, 0, 0, 0 };
 
+    public bool wonGame = false;
+    public bool gameOver = false;
+
+
+    [SerializeField]
+    TextMeshProUGUI diceText;
+
+    [SerializeField]
+    TextMeshProUGUI turnText;
+
 
     void Update()
     {
         // Check if the space key is pressed
-        if (Input.GetKeyDown(KeyCode.Space))
+        if (Input.GetKeyDown(KeyCode.Space) && !gameOver)
         {
+            
             // Use switch case to determine whose turn it is based on turn counter
             switch (turnCounter)
             {
@@ -58,6 +70,7 @@ public class GameMechanics : MonoBehaviour
                 turnCounter = 0;
             }
 
+            turnText.text = "Current Turn: Player " + (turnCounter + 1);
         }
     }
 
@@ -66,23 +79,32 @@ public class GameMechanics : MonoBehaviour
     {
         // Roll dice and log the result
         int diceRollNumber = DiceRoll();
+        diceText.text = "Dice: " + diceRollNumber;
         Debug.Log(diceRollNumber);
 
         // Add dice roll to position after roll array for the current player
         positionAfterRoll[index] += diceRollNumber;
 
-        // Check if player has reached the end of the board and log winner if true
+        // Check if player has reached the end of the board and set wonGame=true if index=0(your player)
         if (positionAfterRoll[index] == tiles.Length - 1)
         {
-            MoveForward(index, currentPiece, tiles);
-            Debug.Log("Player " + (index+1) + " won");
+            StartCoroutine(MoveForward(index, currentPiece, tiles));
+            gameOver = true;
+
+            if(index == 0)
+            {
+                wonGame = true;
+                Debug.Log("You won");
+            }
+
+            Debug.Log("Player " + (index + 1) + " won");
         }
 
         // Move player forward if they have not reached the end of the board
         if (positionAfterRoll[index] < tiles.Length)
         {
             Debug.Log(positionAfterRoll[index]);
-            MoveForward(index, currentPiece, tiles);
+            StartCoroutine(MoveForward(index, currentPiece, tiles));
         }
         // Reset position after roll to current index if player overshoots end of board
         else
@@ -99,11 +121,12 @@ public class GameMechanics : MonoBehaviour
     }
 
     // Define MoveForward method to move player piece to the next tile
-    void MoveForward(int index,GameObject currentPiece, GameObject[] tiles)
+    IEnumerator MoveForward(int index,GameObject currentPiece, GameObject[] tiles)
     {
         for (int i = currentIndex[index]; i <= positionAfterRoll[index]; i++)
         {
             currentPiece.transform.position = tiles[i].transform.position;
+            yield return new WaitForSeconds(0);
         }
         currentIndex[index] = positionAfterRoll[index];
     }
