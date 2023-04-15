@@ -74,6 +74,11 @@ public class GameMechanics : MonoBehaviour
 
     }
 
+    void enterInnerArea()
+    {
+
+    }
+
     int DiceRoll()
     {
         return Random.Range(1, 7);
