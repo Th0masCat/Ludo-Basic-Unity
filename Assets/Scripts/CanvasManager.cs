@@ -1,11 +1,9 @@
 // This script manages the in-game UI and end game screen
-// It also handles the replay and quit buttons
 
 using System.Collections;
 using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
-using UnityEngine.SceneManagement;
 
 public class CanvasManager : MonoBehaviour
 {
@@ -24,9 +22,6 @@ public class CanvasManager : MonoBehaviour
     [SerializeField]
     GameObject gameUI;
 
-    [SerializeField]
-    Animator animator;
-
     public bool paused = false;
 
     private void Start()
@@ -37,12 +32,13 @@ public class CanvasManager : MonoBehaviour
 
     private void Update()
     {
+        //Pause the game
         if (Input.GetKeyDown(KeyCode.Escape))
         {
             paused = !paused;
         }
 
-
+        //Enable game UI and disable pause UI
         if (!paused)
         {
             endGameScreen.SetActive(false);

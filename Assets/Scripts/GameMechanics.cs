@@ -37,6 +37,10 @@ public class GameMechanics : MonoBehaviour
     [SerializeField]
     TextMeshProUGUI turnText;
 
+    // Text game object to display when to press spacebar for player's turn
+    [SerializeField]
+    GameObject spacebarText;
+
     void Update()
     {
         // Checking if the space key is pressed and the game is not over or the turn is not ongoing
@@ -126,9 +130,15 @@ public class GameMechanics : MonoBehaviour
 
             // set the turnGoing bool to true to prevent the player from rolling the dice again before their turn is over
             turnGoing = true;
+
+            //Spacebar text game object set active
+            spacebarText.SetActive(false);
+
+            //Wait for 0.5 seconds
             yield return new WaitForSeconds(0.5f);
         }
 
+        spacebarText.SetActive(true);
         pawnGameObject[index].GetComponent<Animator>().SetBool("moving", false);
         turnGoing = false;
 

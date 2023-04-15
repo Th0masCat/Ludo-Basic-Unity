@@ -5,9 +5,11 @@ using UnityEngine.SceneManagement;
 
 public class SceneChangeScript : MonoBehaviour
 {
+    //Fade Animation Animator
     [SerializeField]
     Animator animator;
 
+    // Called when start button is clicked
     public void StartGame()
     {
         StartCoroutine(LoadScene(1));
@@ -26,6 +28,7 @@ public class SceneChangeScript : MonoBehaviour
         StartCoroutine(LoadScene(0));
     }
 
+    //IEnumerator to play the fade animation and load scene with given index
     public IEnumerator LoadScene(int index)
     {
         animator.SetTrigger("fade");
