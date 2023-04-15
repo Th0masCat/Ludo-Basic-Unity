@@ -1,11 +1,11 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using static UnityEditor.Experimental.AssetDatabaseExperimental.AssetDatabaseCounters;
 
 public class GameMechanics : MonoBehaviour
 {
 
+    // Define arrays of tiles for each color, and an array of player game objects
     [SerializeField]
     GameObject[] redTiles;
 
@@ -19,77 +19,91 @@ public class GameMechanics : MonoBehaviour
     GameObject[] blueTiles;
 
     [SerializeField]
-    GameObject[] playerPrefab;
+    GameObject[] pawnGameObject;
 
+    // Declare and initialize turn counter, current index array, and position after roll array
+    int turnCounter = 0;
+    int[] currentIndex = new int[] { 0, 0, 0, 0 };
+    int[] positionAfterRoll = new int[] { 0, 0, 0, 0 };
 
-
-    int x = 0;
 
     void Update()
     {
+        // Check if the space key is pressed
         if (Input.GetKeyDown(KeyCode.Space))
         {
-            switch (x)
+            // Use switch case to determine whose turn it is based on turn counter
+            switch (turnCounter)
             {
                 case 0:
-                    Turn(0, playerPrefab[0], redTiles);
+                    Turn(0, pawnGameObject[0], redTiles);
                     break;
                 case 1:
-                    Turn(1, playerPrefab[1], blueTiles);
+                    Turn(1, pawnGameObject[1], blueTiles);
                     break;
                 case 2:
-                    Turn(2, playerPrefab[2], yellowTiles);
+                    Turn(2, pawnGameObject[2], yellowTiles);
                     break;
                 case 3:
-                    Turn(3, playerPrefab[3], greenTiles);
+                    Turn(3, pawnGameObject[3], greenTiles);
                     break;
                 default:
                     break;
             }
-            x++;
-            if(x == 4)
+
+            // Increment turn counter and reset if it reaches 4
+            turnCounter++;
+            if(turnCounter == 4)
             {
-                x = 0;
+                turnCounter = 0;
             }
 
         }
     }
 
-    int[] currentIndex = new int[] {0, 0, 0, 0};
-    int[] positionAfterRoll = new int[] { 0, 0, 0, 0 };
-
-
-
+    // Define Turn method to handle player turns
     void Turn(int index, GameObject currentPiece, GameObject[] tiles)
     {
+        // Roll dice and log the result
         int diceRollNumber = DiceRoll();
+        Debug.Log(diceRollNumber);
 
+        // Add dice roll to position after roll array for the current player
         positionAfterRoll[index] += diceRollNumber;
-        
-        if (positionAfterRoll[index] < tiles.Length - 1)
+
+        // Check if player has reached the end of the board and log winner if true
+        if (positionAfterRoll[index] == tiles.Length - 1)
         {
             MoveForward(index, currentPiece, tiles);
+            Debug.Log("Player " + (index+1) + " won");
+        }
+
+        // Move player forward if they have not reached the end of the board
+        if (positionAfterRoll[index] < tiles.Length)
+        {
             Debug.Log(positionAfterRoll[index]);
+            MoveForward(index, currentPiece, tiles);
+        }
+        // Reset position after roll to current index if player overshoots end of board
+        else
+        {
+            positionAfterRoll[index] = currentIndex[index];
         }
 
     }
 
-    void enterInnerArea()
-    {
-
-    }
-
+    // Define DiceRoll method to return a random integer between 1 and 6
     int DiceRoll()
     {
         return Random.Range(1, 7);
     }
 
+    // Define MoveForward method to move player piece to the next tile
     void MoveForward(int index,GameObject currentPiece, GameObject[] tiles)
     {
         for (int i = currentIndex[index]; i <= positionAfterRoll[index]; i++)
         {
             currentPiece.transform.position = tiles[i].transform.position;
-            Debug.Log(positionAfterRoll[index]);
         }
         currentIndex[index] = positionAfterRoll[index];
     }
